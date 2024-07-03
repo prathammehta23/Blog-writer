@@ -1,3 +1,5 @@
+##The following code uses mistral as it's llm so be sure to have mistral downloaded from the ollama which is available on the internet.
+
 # Warning control
 import warnings
 warnings.filterwarnings('ignore')
