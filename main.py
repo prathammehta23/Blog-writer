@@ -1,24 +1,26 @@
-##The following code uses mistral as it's llm so be sure to have mistral downloaded from the ollama which is available on the internet.
-
 # Warning control
 import warnings
 warnings.filterwarnings('ignore')
-from langchain_openai import ChatOpenAI
+from langchain_google_genai import ChatGoogleGenerativeAI
 from crewai import Agent, Task, Crew
 import os
 
-llm = ChatOpenAI(
-    model="crewai-mistral",
-    openai_api_key="NA",
-    base_url="http://localhost:11434/v1"
-)
-
 topic = input("What is your topic? ")
+
+llm = ChatGoogleGenerativeAI(
+    model="gemini-pro",
+    temperature=0.5,
+    verbose=True,
+    google_api_key="AIzaSyCPD-4v0Hklwzn_Xk4SnMQWLWtkx5DNvf4"
+)
 planner = Agent(
     role="Content Planner",
-    goal=f"Plan engaging and factually accurate content on {topic}",
-    backstory="You're writing a letter to your father "
+    goal=f"Plan engaging and factually accurate content on topic:{topic}",
+    backstory="You're working on planning a blog article "
               f"about the topic: {topic}."
+              "You collect information that helps the "
+              "audience learn something "
+              "and make informed decisions. "
               "Your work is the basis for "
               "the Content Writer to write an article on this topic.",
     allow_delegation=False,
@@ -28,17 +30,22 @@ planner = Agent(
 
 writer = Agent(
     role="Content Writer",
-    goal="Write an emotional heart-touching "
-         f"letter about the topic: {topic}",
+    goal="Write insightful and factually accurate "
+         f"opinion piece about the topic: {topic}",
     backstory="You're working on a writing "
-              f"a sweet letter about the topic: {topic}. "
+              f"a new opinion piece about the topic: {topic}. "
               "You base your writing on the work of "
               "the Content Planner, who provides an outline "
               "and relevant context about the topic. "
               "You follow the main objectives and "
               "direction of the outline, "
-              "as provide by the Content Planner. ",
-
+              "as provide by the Content Planner. "
+              "You also provide objective and impartial insights "
+              "and back them up with information "
+              "provide by the Content Planner. "
+              "You acknowledge in your opinion piece "
+              "when your statements are opinions "
+              "as opposed to objective statements.",
     allow_delegation=False,
     verbose=True,
     llm=llm
@@ -82,6 +89,7 @@ write = Task(
     description=(
         "1. Use the content plan to craft a compelling "
             f"blog post on {topic}.\n"
+        "2. Incorporate SEO keywords naturally.\n"
 		"3. Sections/Subtitles are properly named "
             "in an engaging manner.\n"
         "4. Ensure the post is structured with an "
@@ -89,7 +97,7 @@ write = Task(
             "and a summarizing conclusion.\n"
         "5. Proofread for grammatical errors and "
             "alignment with the brand's voice.\n"
-        "6. There should be at least 2000 words in the whole letter"
+        "6. There should be at least 2000 words in the whole blog"
     ),
     expected_output="A well-written blog post "
         "in markdown format, ready for publication, "
